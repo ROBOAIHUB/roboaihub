@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-deep-space text-starlight font-mono;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  @apply bg-space-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-b from-blue-800 to-neon-red rounded-full border-2 border-space-900;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-neon-red;
+}
+
+/* Neon Text Utilities */
+.text-glow-blue {
+  text-shadow: 0 0 10px #00f2ff, 0 0 20px #001133;
+}
+
+.text-glow-red {
+  text-shadow: 0 0 10px #ff3366, 0 0 20px #550000;
+}
+
+@keyframes glow-cycle {
+  0% {
+    text-shadow: 0 0 10px #00f2ff, 0 0 20px #001133;
+    color: #00f2ff;
+  }
+
+  50% {
+    text-shadow: 0 0 10px #ff3366, 0 0 20px #550000;
+    color: #ff3366;
+  }
+
+  100% {
+    text-shadow: 0 0 10px #00f2ff, 0 0 20px #001133;
+    color: #00f2ff;
+  }
+}
+
+.animate-glow-cycle {
+  animation: glow-cycle 3s infinite alternate ease-in-out;
+}
