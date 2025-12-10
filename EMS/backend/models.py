@@ -18,6 +18,7 @@ class User(BaseModel):
     full_name: Optional[str] = None
     disabled: Optional[bool] = None
     is_mentor: bool = False
+    is_admin: bool = False
     roles: List[str] = []
     designation: Optional[str] = None
     avenger_character: Optional[str] = "Avengers"

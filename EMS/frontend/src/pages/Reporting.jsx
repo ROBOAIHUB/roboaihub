@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { motion } from 'framer-motion';
 
 const Reporting = () => {
     const { user } = useAuth();
@@ -39,6 +38,23 @@ const Reporting = () => {
     }, []);
 
     const [times, setTimes] = useState({ in_time: '', out_time: '' });
+
+    // Time-based Access Control
+    const [isPortalOpen, setIsPortalOpen] = useState(true);
+
+    useEffect(() => {
+        const checkTime = () => {
+            const currentHour = new Date().getHours();
+            // Open between 8 AM (inclusive) and 8 PM (exclusive, so up to 19:59)
+            if (currentHour >= 8 && currentHour < 20) {
+                setIsPortalOpen(true);
+            } else {
+                setIsPortalOpen(false);
+            }
+        };
+
+        checkTime();
+    }, []);
 
     const handleChange = (index, field, value) => {
         if (index === null) {
@@ -82,6 +98,25 @@ const Reporting = () => {
 
     if (loading) return <div className="p-10 text-neon-blue animate-pulse">Initializing Interface...</div>;
 
+    if (!isPortalOpen) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[60vh] text-center p-8 border border-red-500/30 bg-black/40 rounded-xl backdrop-blur-md shadow-[0_0_50px_rgba(255,0,0,0.2)]">
+                <div className="animate-pulse">
+                    <svg className="w-24 h-24 text-red-500 mb-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                </div>
+                <h2 className="text-4xl font-black text-red-500 mb-2 tracking-widest drop-shadow-[0_0_10px_rgba(255,0,0,0.8)]">SYSTEM LOCKED</h2>
+                <p className="text-xl text-red-300 font-mono mb-6">REPORTING PORTAL OFFLINE</p>
+                <div className="bg-red-900/20 border border-red-500/50 p-4 rounded-lg inline-block">
+                    <p className="text-red-400 font-bold">OPERATING HOURS</p>
+                    <p className="text-2xl text-white font-mono mt-1">08:00 AM - 08:00 PM</p>
+                </div>
+                <p className="mt-8 text-gray-400 text-sm">Please return during operational hours to submit your report.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="">
             <h2 className="text-3xl font-tech text-neon-blue mb-6 drop-shadow-[0_0_10px_rgba(0,242,255,0.3)]">
@@ -89,12 +124,9 @@ const Reporting = () => {
             </h2>
 
             {successMsg && (
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
-                    className="mb-6 p-4 bg-green-900/30 border border-green-500 text-green-400 rounded-lg font-bold text-center"
-                >
+                <div className="mb-6 p-4 bg-green-900/30 border border-green-500 text-green-400 rounded-lg font-bold text-center animate-pulse">
                     {successMsg}
-                </motion.div>
+                </div>
             )}
 
             {/* In Time / Out Time Inputs */}

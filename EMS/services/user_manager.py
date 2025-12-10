@@ -6,40 +6,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 USER_DB_FILE = os.path.join(BASE_DIR, 'users.json')
 
 class UserManager:
-    def __init__(self, drive_manager=None):
-        self.drive_manager = drive_manager
+    def __init__(self):
         self.users = self._load_users()
 
-    def _sync_from_drive(self):
-        """Attempts to download users.json from Drive. Returns True if successful."""
-        if not self.drive_manager:
-            return False
-        
-        print("DEBUG: Checking remote storage for users.json...")
-        try:
-            root_id = self.drive_manager.get_or_create_root_folder()
-            file_id = self.drive_manager.find_file('users.json', parent_id=root_id)
-            
-            if file_id:
-                print(f"DEBUG: Found remote users.json (ID: {file_id}). Downloading...")
-                success, msg = self.drive_manager.download_file(file_id, USER_DB_FILE)
-                if success:
-                    print("DEBUG: Remote users.json downloaded successfully.")
-                    return True
-                else:
-                    print(f"DEBUG: Failed to download remote users.json: {msg}")
-            else:
-                print("DEBUG: No remote users.json found.")
-        except Exception as e:
-            print(f"ERROR: Sync from Drive failed: {e}")
-        return False
-
     def _load_users(self):
-        # 1. Try to sync from Drive if available
-        if self.drive_manager:
-            self._sync_from_drive()
-
-        # 2. Load from local file (which might have just been updated)
         if not os.path.exists(USER_DB_FILE):
             return self._create_default_users()
         try:
@@ -69,29 +39,9 @@ class UserManager:
             json.dump(users, f, indent=4)
         return users
 
-    def _sync_to_drive(self):
-        """Attempts to upload users.json to Drive."""
-        if not self.drive_manager:
-            return
-
-        print("DEBUG: Syncing users.json to remote storage...")
-        try:
-            root_id = self.drive_manager.get_or_create_root_folder()
-            success, msg = self.drive_manager.upload_file(USER_DB_FILE, 'users.json', parent_id=root_id)
-            if success:
-                print("DEBUG: Remote users.json updated successfully.")
-            else:
-                print(f"DEBUG: Failed to update remote users.json: {msg}")
-        except Exception as e:
-            print(f"ERROR: Sync to Drive failed: {e}")
-
     def _save_users(self):
         with open(USER_DB_FILE, 'w') as f:
             json.dump(self.users, f, indent=4)
-        
-        # Sync to Drive after local save
-        if self.drive_manager:
-            self._sync_to_drive()
 
     def add_employee(self, emp_id, name, email, folder_id, password, designation, roles, is_mentor=False):
         if emp_id in self.users:

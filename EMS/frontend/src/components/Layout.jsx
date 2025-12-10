@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
+
 
 const Layout = () => {
     const { logout, user } = useAuth();
@@ -145,7 +145,7 @@ const Layout = () => {
                         <span className="text-xs text-neon-blue font-bold hidden sm:block border-r border-blue-900 pr-3 mr-1">{user?.name || user?.full_name}</span>
 
                         {/* Employee Navigation Links */}
-                        {!user?.roles?.includes('Admin') ? (
+                        {!user?.is_admin ? (
                             <div className="flex items-center gap-4 text-xs font-bold tracking-wider">
                                 <Link to="/roles" className={`hover:text-neon-blue transition ${location.pathname === '/roles' ? 'text-neon-blue border-b border-neon-blue' : 'text-starlight'}`}>
                                     ROLES

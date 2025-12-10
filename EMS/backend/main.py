@@ -8,38 +8,22 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from services.user_manager import UserManager
-from services.drive_manager import DriveManager
-from services.sheet_manager import SheetManager
-from google_setup import get_drive_service, get_sheets_service
-from auth import create_access_token, verify_password, get_current_user
-from models import User, Token
-from routers import reports, admin
+from backend.auth import create_access_token, verify_password, get_current_user
+from backend.models import User, Token
+from backend.routers import reports, admin
 
 app = FastAPI(title="EMS API", version="1.0.0")
 
-# Initialize Services
-try:
-    drive_service = get_drive_service()
-    sheets_service = get_sheets_service()
-    
-    drive_manager = DriveManager(drive_service)
-    user_manager = UserManager(drive_manager)
-    sheet_manager = SheetManager(sheets_service, drive_manager)
-except Exception as e:
-    print(f"CRITICAL ERROR: Failed to initialize Google Services: {e}")
-    # Fallback for dev if credentials missing, though this will break features
-    user_manager = UserManager() 
-    sheet_manager = None 
+# Initialize Managers
+user_manager = UserManager()
 
 app.include_router(reports.router)
 app.include_router(admin.router)
 
 # CORS Configuration
 origins = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "https://*.github.io", # Allow generic GitHub Pages
-    "*" # Temporary for ease of deployment, user should lock this down later
+    "http://localhost:5173", # Vite default port
+    "http://localhost:3000", # React default port
 ]
 
 app.add_middleware(
@@ -83,6 +67,7 @@ async def read_users_me(current_user: str = Depends(get_current_user)):
         email=user_data.get('email'),
         full_name=user_data.get('name'),
         is_mentor=user_data.get('is_mentor', False),
+        is_admin=user_data.get('is_admin', False),
         roles=user_data.get('roles', []),
         designation=user_data.get('designation'),
         avenger_character=user_data.get('avenger_character', 'Avengers')

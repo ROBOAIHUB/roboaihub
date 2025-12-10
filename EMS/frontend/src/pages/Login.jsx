@@ -15,8 +15,8 @@ const Login = () => {
         setError('');
         try {
             const userData = await login(username, password);
-            // Check for Admin role (Case sensitive, usually 'Admin')
-            if (userData.roles && userData.roles.includes('Admin')) {
+            // Check for Admin role using is_admin flag from backend
+            if (userData.is_admin) {
                 navigate('/admin');
             } else {
                 navigate('/dashboard');
