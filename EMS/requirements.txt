@@ -5,4 +5,3 @@ pandas
 apscheduler
 google-auth-oauthlib
 plotly
-email-validator
