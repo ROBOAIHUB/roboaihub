@@ -25,10 +25,26 @@ from services.sheet_manager import SheetManager
 user_manager = UserManager()
 
 # Initialize Google Services via AuthManager
+# Note: authentication might happen on first request if triggered lazily, 
+# but let's try to authenticate on startup.
 auth_manager = AuthManager()
 auth_manager.authenticate()
+
+# Services might be None if auth failed initially.
+# We must ensure they are refreshed if needed.
 drive_manager = DriveManager(auth_manager.get_drive_service())
-sheet_manager = SheetManager(auth_manager.get_sheet_service()) # Valid Sheet Manager instance
+sheet_manager = SheetManager(auth_manager.get_sheet_service()) 
+
+def get_fresh_drive_manager():
+    # Helper to ensure we have a valid service (in case Auth renewed)
+    if not drive_manager.service:
+         drive_manager.service = auth_manager.get_drive_service()
+    return drive_manager
+
+def get_fresh_sheet_manager():
+    if not sheet_manager.service:
+         sheet_manager.service = auth_manager.get_sheet_service()
+    return sheet_manager
 
 @router.get("/debug-auth")
 async def debug_auth_status():
@@ -128,8 +144,21 @@ async def assign_tasks(assignment: BulkTaskAssignment, current_user: TokenData =
         raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
 
     # Update Sheet using globally initialized sheet_manager and drive_manager
-    success, msg = sheet_manager.update_task_assignment(
-        drive_manager, 
+    # Ensure services are valid (retry auth?)
+    current_drive_manager = get_fresh_drive_manager()
+    current_sheet_manager = get_fresh_sheet_manager()
+    
+    if not current_drive_manager.service or not current_sheet_manager.service:
+        # Try one last re-auth attempt?
+        auth_manager.authenticate()
+        current_drive_manager = get_fresh_drive_manager()
+        current_sheet_manager = get_fresh_sheet_manager()
+        
+    if not current_drive_manager.service:
+         raise HTTPException(status_code=500, detail="Google Drive Service Unavailable (Auth Failed)")
+
+    success, msg = current_sheet_manager.update_task_assignment(
+        current_drive_manager, 
         folder_id, 
         date_obj, 
         assignment.tasks
