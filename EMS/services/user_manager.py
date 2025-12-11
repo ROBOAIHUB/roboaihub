@@ -10,13 +10,20 @@ class UserManager:
         self.users = self._load_users()
 
     def _load_users(self):
+        print(f"DEBUG: Loading users from {USER_DB_FILE}")
+        print(f"DEBUG: File exists? {os.path.exists(USER_DB_FILE)}")
+        print(f"DEBUG: Current CWD: {os.getcwd()}")
+        
         if not os.path.exists(USER_DB_FILE):
+            print("WARNING: users.json NOT FOUND. Creating default test user.")
             return self._create_default_users()
         try:
             with open(USER_DB_FILE, 'r') as f:
                 users = json.load(f)
                 if not users:
+                    print("WARNING: users.json is EMPTY.")
                     return self._create_default_users()
+                print(f"DEBUG: Successfully loaded {len(users)} users: {list(users.keys())}")
                 return users
         except Exception as e:
             print(f"ERROR: Failed to load users.json: {e}")
