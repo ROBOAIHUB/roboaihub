@@ -1,8 +1,74 @@
 import datetime
+from googleapiclient.errors import HttpError
+import calendar
+import time
 
 class SheetManager:
     def __init__(self, sheet_service):
         self.service = sheet_service
+
+    def create_month_sheets_for_all(self, drive_manager, user_manager, month, year):
+        """
+        Generates daily sheets for all employees for the given month/year.
+        Returns a summary dict: { "success": int, "skipped": int, "errors": [] }
+        """
+        employees = user_manager.get_all_employees()
+        summary = {"success": 0, "skipped": 0, "errors": []}
+        
+        # Get number of days in month
+        _, num_days = calendar.monthrange(year, month)
+        month_str = datetime.date(year, month, 1).strftime("%B_%Y")
+        
+        print(f"DEBUG: Starting Bulk Generation for {month_str} ({num_days} days) for {len(employees)} employees.")
+        
+        for emp_id, emp_data in employees.items():
+            if emp_id == 'RAH-000': continue # Skip Master Admin if needed, or include? Usually skip.
+            
+            emp_name = emp_data.get('name')
+            folder_id = emp_data.get('folder_id')
+            
+            if not folder_id or folder_id == "dummy_folder_id" or "placeholder" in folder_id:
+                summary["errors"].append(f"Skipped {emp_name}: Invalid Folder ID")
+                continue
+
+            # 1. Ensure Month Folder Exists
+            try:
+                month_folder_id = drive_manager._find_folder(month_str, folder_id)
+                if not month_folder_id:
+                    month_folder_id = drive_manager.create_folder(month_str, folder_id)
+                    print(f"DEBUG: Created folder {month_str} for {emp_name}")
+            except Exception as e:
+                summary["errors"].append(f"{emp_name}: Failed to create month folder. {e}")
+                continue
+
+            # 2. Loop Days
+            for day in range(1, num_days + 1):
+                day_str = f"Day {day}"
+                try:
+                    # Check if sheet exists using _find logic (but specifically for sheet)
+                    # Optimization: List ALL files in month folder ONCE?
+                    # For now, let's use the explicit check to be safe, but it might be slow.
+                    # drive_manager doesn't have a public check_file_exists. 
+                    # We can use the logic from update_task_assignment
+                    
+                    query = f"'{month_folder_id}' in parents and name='{day_str}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false"
+                    files_res = drive_manager.service.files().list(q=query, fields="files(id)").execute()
+                    files = files_res.get('files', [])
+                    
+                    if not files:
+                        # Create Sheet
+                        sheet_id = drive_manager.create_spreadsheet(day_str, month_folder_id)
+                        # Initialize Headers? (Optional: Add headers to row 1)
+                        # self.initialize_sheet(sheet_id) 
+                        summary["success"] += 1
+                        # print(f"Created {day_str} for {emp_name}")
+                    else:
+                        summary["skipped"] += 1
+                        
+                except Exception as e:
+                    summary["errors"].append(f"{emp_name} - {day_str}: {e}")
+                    
+        return summary
 
     def create_month_sheets(self, drive_manager, folder_id, year, month):
         # Create 31 separate spreadsheet files

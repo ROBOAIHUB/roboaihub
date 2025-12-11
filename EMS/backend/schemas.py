@@ -49,3 +49,7 @@ class BulkTaskAssignment(BaseModel):
     emp_id: str
     date: str  # YYYY-MM-DD
     tasks: List[TaskAssignment]
+
+class SheetGenerationRequest(BaseModel):
+    month: int
+    year: int
