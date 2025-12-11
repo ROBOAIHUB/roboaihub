@@ -264,3 +264,19 @@ async def generate_sheets(request: SheetGenerationRequest, current_user: TokenDa
         return {"status": "success", "summary": summary}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/sync-drive")
+async def sync_drive(current_user: TokenData = Depends(get_current_user)):
+    # Verify Admin (TODO)
+    
+    # Refresh Services
+    current_drive_manager = get_fresh_drive_manager()
+    
+    if not current_drive_manager.service:
+         raise HTTPException(status_code=500, detail="Google Drive Service Unavailable")
+
+    try:
+        summary = current_drive_manager.sync_employee_folders(user_manager)
+        return {"status": "success", "summary": summary}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

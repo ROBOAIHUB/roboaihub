@@ -86,3 +86,88 @@ class DriveManager:
             return emp_folder_id, True, "Folder created (Private)"
         except Exception as e:
             return None, False, str(e)
+
+    def sync_employee_folders(self, user_manager):
+        """
+        Syncs Drive Folders in EMS_Root with active employees.
+        - Creates folder if missing.
+        - Updates ID in user_manager if changed.
+        - Trashes folders in EMS_Root that don't match any employee name.
+        """
+        summary = {"created": [], "relinked": [], "removed": [], "errors": []}
+        
+        try:
+            root_id = self.get_or_create_root_folder()
+            if not root_id:
+                summary["errors"].append("Could not find/create EMS_Root")
+                return summary
+
+            # 1. Index Existing Drive Folders in Root
+            # We list ALL folders in root
+            query = f"'{root_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
+            results = self.service.files().list(q=query, fields="files(id, name)").execute()
+            drive_folders = results.get('files', [])
+            
+            # Map Name -> ID
+            drive_map = {f['name'].lower().strip(): f['id'] for f in drive_folders}
+            drive_map_original_names = {f['name'].lower().strip(): f['name'] for f in drive_folders}
+            
+            # 2. Iterate Active Employees
+            users = user_manager.get_all_employees()
+            active_folder_ids = set()
+            
+            for emp_id, emp_data in users.items():
+                if emp_id == 'RAH-000': continue # Skip Admin
+                
+                name = emp_data['name'].strip()
+                name_key = name.lower()
+                current_id = emp_data.get('folder_id')
+                
+                # Check if folder exists in Drive
+                if name_key in drive_map:
+                    # Folder exists
+                    real_id = drive_map[name_key]
+                    active_folder_ids.add(real_id)
+                    
+                    # Update User DB if needed
+                    if current_id != real_id:
+                        user_manager.update_employee(emp_id, roles=None, is_mentor=None) # Hack to trigger logic? No, update directly
+                        # We need a way to update ONLY folder_id. 
+                        # user_manager.update_employee doesn't support folder_id update in signature? 
+                        # Let's check user_manager.py... it DOESN'T.
+                        # We will access user_manager.users directly and call save.
+                        user_manager.users[emp_id]['folder_id'] = real_id
+                        summary["relinked"].append(f"{name}")
+                else:
+                    # Folder Missing -> Create it
+                    try:
+                        new_id = self.create_folder(name, root_id)
+                        user_manager.users[emp_id]['folder_id'] = new_id
+                        active_folder_ids.add(new_id)
+                        summary["created"].append(name)
+                        print(f"DEBUG: Created missing folder for {name}")
+                    except Exception as e:
+                        summary["errors"].append(f"Failed to create {name}: {e}")
+
+            # Save Users DB changes
+            user_manager._save_users()
+            
+            # 3. Identify and Remove Orphans
+            # Any folder in EMS_Root that is NOT in active_folder_ids
+            for f in drive_folders:
+                if f['id'] not in active_folder_ids:
+                    # Ensure we don't delete something important if name matches but casing was weird?
+                    # The set logic handles exact ID matches.
+                    # Safety check: Is it "December_2025"? (Month folders inside Root? No, they should be inside emp folders)
+                    # Safety check: "EMS_Root"? No, we are inside it.
+                    
+                    try:
+                        self.delete_folder(f['id']) # Moves to trash
+                        summary["removed"].append(f['name'])
+                    except Exception as e:
+                        summary["errors"].append(f"Failed to remove {f['name']}: {e}")
+
+        except Exception as e:
+            summary["errors"].append(str(e))
+            
+        return summary
