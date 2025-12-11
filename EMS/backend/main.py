@@ -22,8 +22,7 @@ app.include_router(admin.router)
 
 # CORS Configuration
 origins = [
-    "http://localhost:5173", # Vite default port
-    "http://localhost:3000", # React default port
+    "*", # Allow all origins for production (or specifc Render URL)
 ]
 
 app.add_middleware(
