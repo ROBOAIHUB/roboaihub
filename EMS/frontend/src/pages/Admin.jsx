@@ -151,6 +151,61 @@ const Admin = () => {
                 </div>
             </div>
 
+            {/* Sheet Management Card */}
+            <div className="bg-space-800 p-6 rounded-xl border border-yellow-500 shadow-neon-blue mb-6">
+                <h3 className="text-xl text-yellow-500 mb-4 font-bold flex items-center gap-2">
+                    <span className="text-2xl">⚡</span> SHEET GENERATION STATION
+                </h3>
+                <div className="flex flex-wrap items-end gap-4">
+                    <div>
+                        <label className="block text-xs text-starlight mb-1">Target Month</label>
+                        <select
+                            id="sheetMonth"
+                            className="bg-space-900 border border-blue-800 text-white p-3 rounded w-32 focus:border-neon-blue focus:outline-none"
+                            defaultValue={new Date().getMonth() + 1}
+                        >
+                            {Array.from({ length: 12 }, (_, i) => (
+                                <option key={i} value={i + 1}>{new Date(0, i).toLocaleString('default', { month: 'long' })}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-xs text-starlight mb-1">Target Year</label>
+                        <select
+                            id="sheetYear"
+                            className="bg-space-900 border border-blue-800 text-white p-3 rounded w-24 focus:border-neon-blue focus:outline-none"
+                            defaultValue={new Date().getFullYear()}
+                        >
+                            <option value={2024}>2024</option>
+                            <option value={2025}>2025</option>
+                            <option value={2026}>2026</option>
+                        </select>
+                    </div>
+                    <button
+                        onClick={async () => {
+                            const m = parseInt(document.getElementById('sheetMonth').value);
+                            const y = parseInt(document.getElementById('sheetYear').value);
+                            if (!window.confirm(`Initialize Bulk Sheet Generation for ${m}/${y}? This may take 2-3 minutes.`)) return;
+
+                            setMsg('Initializing Sequence... Please Wait. ⏳');
+                            try {
+                                const res = await api.post('/admin/generate-sheets', { month: m, year: y });
+                                setMsg(`Operation Complete! Success: ${res.data.summary.success}, Skipped: ${res.data.summary.skipped}. ✅`);
+                            } catch (err) {
+                                console.error(err);
+                                setMsg('Sequence Failed. Check Logs. ❌');
+                            }
+                        }}
+                        className="px-6 py-3 bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded shadow-[0_0_15px_rgba(255,215,0,0.3)] transition uppercase tracking-wider h-[48px]"
+                    >
+                        Prepare Monthly Sheets
+                    </button>
+                    <p className="text-xs text-starlight opacity-50 max-w-sm ml-4 mb-2">
+                        *Creates missing daily sheets for all active employees. Skips existing ones.
+                    </p>
+                </div>
+            </div>
+
             {/* Add Employee Modal */}
             {addModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
