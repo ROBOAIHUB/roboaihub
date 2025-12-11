@@ -231,19 +231,31 @@ class SheetManager:
         # tasks_list: List of dicts or objects with {priority, task, expected_time, deadline}
         
         month_str = date_obj.strftime("%B_%Y")
+        print(f"DEBUG: Looking for Month Folder '{month_str}' inside '{employee_folder_id}'")
         month_folder_id = drive_manager._find_folder(month_str, employee_folder_id)
         if not month_folder_id:
+            print(f"ERROR: Month Folder '{month_str}' NOT FOUND.")
             return False, f"Folder for {month_str} not found."
+        
+        print(f"DEBUG: Found Month Folder ID: {month_folder_id}")
 
         day_str = f"Day {date_obj.day}"
+        print(f"DEBUG: Looking for Sheet '{day_str}' inside '{month_folder_id}'")
         query = f"'{month_folder_id}' in parents and name='{day_str}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false"
         
-        files = drive_manager.service.files().list(q=query, fields="files(id)").execute().get('files', [])
+        try:
+            files_res = drive_manager.service.files().list(q=query, fields="files(id, name)").execute()
+            files = files_res.get('files', [])
+        except Exception as e:
+            print(f"ERROR: Drive List API Failed: {e}")
+            return False, f"Drive API Error: {str(e)}"
         
         if not files:
+            print(f"ERROR: Sheet '{day_str}' NOT FOUND in '{month_str}'")
             return False, f"Sheet for {day_str} not found."
         
         spreadsheet_id = files[0]['id']
+        print(f"DEBUG: Found Spreadsheet ID: {spreadsheet_id}")
 
         # Write to Columns G-J (Index 6-9) starting Row 2
         # Headers: Priority, Task, Deadline, Expected Time
