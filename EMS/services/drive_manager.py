@@ -105,9 +105,12 @@ class DriveManager:
             # 1. Index Existing Drive Folders in Root
             # We list ALL folders in root
             query = f"'{root_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
-            results = self.service.files().list(q=query, fields="files(id, name)").execute()
+            results = self.service.files().list(q=query, fields="files(id, name)", pageSize=100).execute()
             drive_folders = results.get('files', [])
             
+            print(f"DEBUG: Sync Root ID: {root_id}")
+            print(f"DEBUG: Found {len(drive_folders)} folders in Root: {[f['name'] for f in drive_folders]}")
+
             # Map Name -> ID
             drive_map = {f['name'].lower().strip(): f['id'] for f in drive_folders}
             drive_map_original_names = {f['name'].lower().strip(): f['name'] for f in drive_folders}
@@ -128,26 +131,27 @@ class DriveManager:
                     # Folder exists
                     real_id = drive_map[name_key]
                     active_folder_ids.add(real_id)
+                    print(f"DEBUG: {name} FOUND in Drive (ID: {real_id})")
                     
                     # Update User DB if needed
                     if current_id != real_id:
-                        user_manager.update_employee(emp_id, roles=None, is_mentor=None) # Hack to trigger logic? No, update directly
-                        # We need a way to update ONLY folder_id. 
-                        # user_manager.update_employee doesn't support folder_id update in signature? 
-                        # Let's check user_manager.py... it DOESN'T.
-                        # We will access user_manager.users directly and call save.
                         user_manager.users[emp_id]['folder_id'] = real_id
                         summary["relinked"].append(f"{name}")
                 else:
                     # Folder Missing -> Create it
+                    print(f"DEBUG: {name} NOT FOUND in Drive. Creating...")
                     try:
                         new_id = self.create_folder(name, root_id)
-                        user_manager.users[emp_id]['folder_id'] = new_id
-                        active_folder_ids.add(new_id)
-                        summary["created"].append(name)
-                        print(f"DEBUG: Created missing folder for {name}")
+                        if new_id:
+                            user_manager.users[emp_id]['folder_id'] = new_id
+                            active_folder_ids.add(new_id)
+                            summary["created"].append(name)
+                            print(f"DEBUG: Created {name} (ID: {new_id})")
+                        else:
+                             summary["errors"].append(f"Create returned None for {name}")
                     except Exception as e:
                         summary["errors"].append(f"Failed to create {name}: {e}")
+                        print(f"ERROR: Failed to create {name}: {e}")
 
             # Save Users DB changes
             user_manager._save_users()
