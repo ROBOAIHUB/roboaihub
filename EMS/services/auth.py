@@ -9,6 +9,29 @@ SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets'
 ]
 
+# Helper to find file in current or parent dirs
+def find_file(filename):
+    # Check current dir
+    if os.path.exists(filename):
+        return filename
+    # Check parent dir (if we are in EMS/backend, check EMS/ or root)
+    parent = os.path.join("..", filename)
+    if os.path.exists(parent):
+        print(f"DEBUG: Found {filename} in parent dir.")
+        return parent
+    # Check /opt/render/project/src (Render Root often here)
+    render_root = os.path.join("/opt/render/project/src", filename)
+    if os.path.exists(render_root):
+         print(f"DEBUG: Found {filename} in Render Root.")
+         return render_root
+    # Check /etc/secrets (Render standard path)
+    secret_path = os.path.join("/etc/secrets", filename)
+    if os.path.exists(secret_path):
+         print(f"DEBUG: Found {filename} in /etc/secrets.")
+         return secret_path
+    
+    return None
+
 CLIENT_SECRET_FILE = 'client_secret.json'
 CREDENTIALS_FILE = 'credentials.json' # Fallback name
 TOKEN_FILE = 'token.json'
@@ -27,13 +50,13 @@ class AuthManager:
         print(f"DEBUG: Checking for credentials.json at {os.path.abspath(CLIENT_SECRET_FILE)}")
 
         # 1. Try Service Account (Best for Server)
-        SERVICE_ACCOUNT_FILE = 'service_account.json'
-        if os.path.exists(SERVICE_ACCOUNT_FILE):
-            print("DEBUG: Found service_account.json. Using Service Account Auth.")
+        service_account_path = find_file('service_account.json')
+        if service_account_path:
+            print(f"DEBUG: Found service_account.json at {service_account_path}. Using Service Account Auth.")
             from google.oauth2 import service_account
             try:
                 self.creds = service_account.Credentials.from_service_account_file(
-                    SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+                    service_account_path, scopes=SCOPES)
                 self.drive_service = build('drive', 'v3', credentials=self.creds)
                 self.sheet_service = build('sheets', 'v4', credentials=self.creds)
                 return True, "Service Account Authentication successful."
@@ -42,9 +65,10 @@ class AuthManager:
                 return False, f"Service Account Auth failed: {str(e)}"
 
         # 2. Try OAuth Token (User Auth)
-        if os.path.exists(TOKEN_FILE):
-            print("DEBUG: Found token.json. Using stored OAuth token.")
-            self.creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+        token_path = find_file(TOKEN_FILE)
+        if token_path:
+            print(f"DEBUG: Found token.json at {token_path}. Using stored OAuth token.")
+            self.creds = Credentials.from_authorized_user_file(token_path, SCOPES)
         
         # If no valid credentials, let user log in
         if not self.creds or not self.creds.valid:
@@ -59,14 +83,14 @@ class AuthManager:
             if not self.creds:
                 print("DEBUG: No valid token found. Attempting fresh login flow...")
                 # Check for either filename
-                secret_file = CLIENT_SECRET_FILE
-                if not os.path.exists(CLIENT_SECRET_FILE):
-                    if os.path.exists(CREDENTIALS_FILE):
-                        print("DEBUG: Found credentials.json, using as secret file.")
-                        secret_file = CREDENTIALS_FILE
-                    else:
-                        print("ERROR: client_secret.json nor credentials.json FOUND.")
-                        return False, "client_secret.json not found."
+                secret_path = find_file(CLIENT_SECRET_FILE)
+                if not secret_path:
+                    secret_path = find_file(CREDENTIALS_FILE)
+                
+                if not secret_path:
+                     print("ERROR: client_secret.json nor credentials.json FOUND in path.")
+                     return False, "client_secret.json not found."
+
                 
                 try:
                     # CANNOT RUN ON RENDER (Headless)
