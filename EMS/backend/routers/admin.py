@@ -30,6 +30,41 @@ auth_manager.authenticate()
 drive_manager = DriveManager(auth_manager.get_drive_service())
 sheet_manager = SheetManager(auth_manager.get_sheet_service()) # Valid Sheet Manager instance
 
+@router.get("/debug-auth")
+async def debug_auth_status():
+    """Temporary endpoint to diagnose Auth and Drive issues."""
+    import os
+    
+    status = {
+        "auth_status": "Unknown",
+        "service_account_present": os.path.exists("service_account.json"),
+        "token_file_present": os.path.exists("token.json"),
+        "credentials_file_present": os.path.exists("credentials.json") or os.path.exists("client_secret.json"),
+        "drive_files": [],
+        "error": None
+    }
+    
+    # 1. Test Auth
+    try:
+        success, msg = auth_manager.authenticate()
+        status["auth_status"] = "Success" if success else f"Failed: {msg}"
+        if not success:
+             return status
+             
+        # 2. Test Drive Access
+        drive = auth_manager.get_drive_service()
+        if drive:
+            results = drive.files().list(pageSize=5, fields="files(id, name)").execute()
+            status["drive_files"] = results.get('files', [])
+        else:
+            status["error"] = "Auth succeeded but Drive Service is None"
+            
+    except Exception as e:
+        status["auth_status"] = "Exception"
+        status["error"] = str(e)
+        
+    return status
+
 @router.get("/employees", response_model=Dict[str, dict])
 async def get_employees(current_user: TokenData = Depends(get_current_user)):
     # Verify if current user is admin? 
