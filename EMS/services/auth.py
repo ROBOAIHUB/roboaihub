@@ -10,6 +10,7 @@ SCOPES = [
 ]
 
 CLIENT_SECRET_FILE = 'client_secret.json'
+CREDENTIALS_FILE = 'credentials.json' # Fallback name
 TOKEN_FILE = 'token.json'
 
 class AuthManager:
@@ -57,16 +58,22 @@ class AuthManager:
             
             if not self.creds:
                 print("DEBUG: No valid token found. Attempting fresh login flow...")
+                # Check for either filename
+                secret_file = CLIENT_SECRET_FILE
                 if not os.path.exists(CLIENT_SECRET_FILE):
-                    print("ERROR: client_secret.json (credentials.json) NOT FOUND.")
-                    return False, "client_secret.json not found."
+                    if os.path.exists(CREDENTIALS_FILE):
+                        print("DEBUG: Found credentials.json, using as secret file.")
+                        secret_file = CREDENTIALS_FILE
+                    else:
+                        print("ERROR: client_secret.json nor credentials.json FOUND.")
+                        return False, "client_secret.json not found."
                 
                 try:
                     # CANNOT RUN ON RENDER (Headless)
                     # We detect if we are on a server by checking env vars or just try/except
                     print("WARNING: Attempting interactive login. This will FAIL on headless servers (Render).")
                     flow = InstalledAppFlow.from_client_secrets_file(
-                        CLIENT_SECRET_FILE, SCOPES)
+                        secret_file, SCOPES)
                     self.creds = flow.run_local_server(port=0, open_browser=True)
                 except Exception as e:
                     print(f"ERROR: Interactive Login failed: {e}")
