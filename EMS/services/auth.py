@@ -97,7 +97,7 @@ class AuthManager:
                     # We detect if we are on a server by checking env vars or just try/except
                     print("WARNING: Attempting interactive login. This will FAIL on headless servers (Render).")
                     flow = InstalledAppFlow.from_client_secrets_file(
-                        secret_file, SCOPES)
+                        secret_path, SCOPES)
                     self.creds = flow.run_local_server(port=0, open_browser=True)
                 except Exception as e:
                     print(f"ERROR: Interactive Login failed: {e}")

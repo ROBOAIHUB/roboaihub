@@ -13,7 +13,8 @@ class DriveManager:
             files = results.get('files', [])
             if files:
                 return files[0]['id']
-        except Exception:
+        except Exception as e:
+            print(f"ERROR: _find_folder API Error for '{name}': {e}")
             return None
         return None
 
