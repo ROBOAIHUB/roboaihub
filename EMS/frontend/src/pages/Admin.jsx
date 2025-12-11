@@ -204,6 +204,37 @@ const Admin = () => {
                         *Creates missing daily sheets for all active employees. Skips existing ones.
                     </p>
                 </div>
+
+                {/* Drive Sync Section */}
+                <div className="mt-8 pt-6 border-t border-yellow-500/30">
+                    <h4 className="text-lg text-neon-blue mb-4 font-bold flex items-center gap-2">
+                        <span className="text-xl">🔄</span> DRIVE SYNCHRONIZATION
+                    </h4>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={async () => {
+                                if (!window.confirm("WARNING: This will DELETE any folder in 'EMS_Root' that does not belong to an active employee.\n\nAre you sure you want to Sync & Clean Up?")) return;
+
+                                setMsg('Syncing Drive... This may take a moment. ⏳');
+                                try {
+                                    const res = await api.post('/admin/sync-drive');
+                                    const s = res.data.summary;
+                                    setMsg(`Sync Complete! Created: ${s.created.length}, Relinked: ${s.relinked.length}, Removed: ${s.removed.length}. ✅`);
+                                } catch (err) {
+                                    console.error(err);
+                                    setMsg('Sync Failed. Check Logs. ❌');
+                                }
+                            }}
+                            className="px-6 py-3 bg-blue-900/50 border border-neon-blue text-neon-blue font-bold rounded hover:bg-neon-blue hover:text-black transition uppercase tracking-wider h-[48px]"
+                        >
+                            Sync & Cleanup Drive
+                        </button>
+                        <p className="text-xs text-starlight opacity-50 max-w-lg">
+                            Scans 'EMS_Root'. Creates folders for missing employees.
+                            <span className="text-red-400 font-bold"> DELETES any folder that isn't linked to an active user.</span>
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* Add Employee Modal */}
