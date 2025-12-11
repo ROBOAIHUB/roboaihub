@@ -235,6 +235,18 @@ class SheetManager:
         month_folder_id = drive_manager._find_folder(month_str, employee_folder_id)
         if not month_folder_id:
             print(f"ERROR: Month Folder '{month_str}' NOT FOUND.")
+            # DEBUG: List what IS in the folder to help diagnose
+            try:
+                print(f"DEBUG: Listing contents of parent folder '{employee_folder_id}':")
+                list_query = f"'{employee_folder_id}' in parents and trashed=false"
+                items = drive_manager.service.files().list(q=list_query, fields="files(id, name, mimeType)").execute().get('files', [])
+                for i in items:
+                    print(f"   - Found: {i['name']} (ID: {i['id']})")
+                if not items:
+                    print("   - Parent folder appears EMPTY to this user.")
+            except Exception as e_list:
+                print(f"DEBUG: Failed to list parent folder: {e_list}")
+                
             return False, f"Folder for {month_str} not found."
         
         print(f"DEBUG: Found Month Folder ID: {month_folder_id}")
