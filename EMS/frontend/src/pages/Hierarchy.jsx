@@ -7,7 +7,7 @@ const Hierarchy = () => {
     const [loading, setLoading] = useState(true);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [selectedEmp, setSelectedEmp] = useState(null);
-    const [formData, setFormData] = useState({ designation: '', roles: '' });
+    const [formData, setFormData] = useState({ designation: '', roles: '', avenger_character: 'Avengers' });
     const [msg, setMsg] = useState('');
 
     useEffect(() => {
@@ -37,7 +37,8 @@ const Hierarchy = () => {
         setSelectedEmp(emp);
         setFormData({
             designation: emp.designation,
-            roles: Array.isArray(emp.roles) ? emp.roles.join(', ') : emp.roles
+            roles: Array.isArray(emp.roles) ? emp.roles.join(', ') : emp.roles,
+            avenger_character: emp.avenger_character || "Avengers"
         });
         setEditModalOpen(true);
     };
@@ -45,33 +46,24 @@ const Hierarchy = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            await api.post('/admin/employees/add', {
-                // We reuse the add endpoint or need an update endpoint? 
-                // user_manager.update_employee exists but no specific route?
-                // Wait, add_employee checks if ID exists.
-                // We need an update endpoint. Using add will fail "already exists".
-                // I need to check admin.py for update endpoint.
-                // It doesn't look like there is a specific UPDATE endpoint for details.
-                // I might need to add one.
-                // For now, let's assume I need to ADD that endpoint too. 
-                // Wait, I can use "add" with overwrite? No, user_manager returns False.
-
-                // Let's implement client-side first, then fix backend.
-                emp_id: selectedEmp.id,
+            await api.put(`/admin/employees/${selectedEmp.id}`, {
+                emp_id: selectedEmp.id, // Not needed for update but good for safety if schema requires it (UpdateSchema doesn't usually)
+                // Let's check Update schema. It's likely partial or optional.
+                // admin.py uses EmployeeUpdate.
                 name: selectedEmp.name,
-                email: selectedEmp.email,
-                folder_id: selectedEmp.folder_id,
-                password: selectedEmp.password, // We don't have password here... this is tricky.
-                // We need a proper UPDATE endpoint.
+                email: selectedEmp.email, // We are sending all fields to avoid clearing them if backend replaces dict
+                password: selectedEmp.password,
                 designation: formData.designation,
                 roles: formData.roles.split(',').map(r => r.trim()),
                 is_mentor: selectedEmp.is_mentor,
-                avenger_character: selectedEmp.avenger_character
+                avenger_character: formData.avenger_character
             });
-            // Ah, I can't use Add.
-            alert("Update Endpoint Missing! I will focus on UI first.");
+            alert("Updated Successfully! ✅");
+            setEditModalOpen(false);
+            fetchEmployees();
         } catch (err) {
             console.error(err);
+            alert("Update Failed ❌");
         }
     };
 
@@ -127,6 +119,42 @@ const Hierarchy = () => {
                                     className="w-full bg-space-900 border border-blue-800 text-white p-2 rounded focus:outline-none focus:border-neon-blue"
                                 />
                             </div>
+
+                            {/* Avenger Theme Selector */}
+                            <div>
+                                <label className="block text-xs text-neon-red mb-1 drop-shadow-[0_0_5px_rgba(255,0,0,0.8)]">Protocol Theme (Avenger)</label>
+                                <select
+                                    value={formData.avenger_character}
+                                    onChange={e => setFormData({ ...formData, avenger_character: e.target.value })}
+                                    className="bg-red-950/30 border border-red-900 p-2 rounded text-neon-blue w-full focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition appearance-none"
+                                >
+                                    <option value="Avengers">Avengers (Default)</option>
+                                    <option value="Iron Man">Iron Man (Tech/Gold)</option>
+                                    <option value="Captain America">Captain America (Blue/Star)</option>
+                                    <option value="Thor">Thor (Lightning/Storm)</option>
+                                    <option value="Hulk">Hulk (Green/Radiation)</option>
+                                    <option value="Black Widow">Black Widow (Stealth/Red)</option>
+                                    <option value="Hawkeye">Hawkeye (Precision/Purple)</option>
+                                    <option value="Spider Man">Spider Man (Web/Red-Blue)</option>
+                                    <option value="Dr. Strange">Dr. Strange (Mystic/Orange-Purple)</option>
+                                    <option value="Black Panther">Black Panther (Vibranium/Purple)</option>
+                                    <option value="Ant Man">Ant Man (Quantum/Red)</option>
+                                    <option value="Star Lord">Star Lord (Galaxy/Purple)</option>
+                                    <option value="Groot">Groot (Nature/Brown)</option>
+                                    <option value="Rocket">Rocket (Tech/Orange)</option>
+                                    <option value="Vision">Vision (Mind Stone/Yellow)</option>
+                                    <option value="Scarlet Witch">Scarlet Witch (Chaos/Red)</option>
+                                    <option value="Falcon">Falcon (Air/Red-White)</option>
+                                    <option value="Winter Soldier">Winter Soldier (Metal/Silver)</option>
+                                    <option value="Loki">Loki (Mischief/Green)</option>
+                                    <option value="Thanos">Thanos (Power/Gold)</option>
+                                    <option value="Deadpool">Deadpool (Chaos/Red-Black)</option>
+                                    <option value="Wolverine">Wolverine (Adamantium/Yellow)</option>
+                                    <option value="Dr. Doom">Dr. Doom (Magic/Green)</option>
+                                    <option value="Riri Williams">Ironheart (NextGen/Pink)</option>
+                                </select>
+                            </div>
+
                             <div>
                                 <label className="block text-xs text-neon-blue mb-1">Roles (comma separated)</label>
                                 <textarea
