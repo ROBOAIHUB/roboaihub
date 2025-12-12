@@ -30,6 +30,7 @@ class EmployeeCreate(BaseModel):
     designation: str
     roles: List[str]
     is_mentor: bool = False
+    avenger_character: str = "Avengers"
 
 class EmployeeUpdate(BaseModel):
     name: Optional[str] = None

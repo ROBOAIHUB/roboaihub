@@ -50,7 +50,7 @@ class UserManager:
         with open(USER_DB_FILE, 'w') as f:
             json.dump(self.users, f, indent=4)
 
-    def add_employee(self, emp_id, name, email, folder_id, password, designation, roles, is_mentor=False):
+    def add_employee(self, emp_id, name, email, folder_id, password, designation, roles, is_mentor=False, avenger_character="Avengers"):
         if emp_id in self.users:
             return False, "Employee ID already exists."
         
@@ -62,6 +62,7 @@ class UserManager:
             'designation': designation,
             'roles': roles, # List of strings
             'is_mentor': is_mentor,
+            'avenger_character': avenger_character,
             'notifications': [] # List of strings
         }
         self._save_users()

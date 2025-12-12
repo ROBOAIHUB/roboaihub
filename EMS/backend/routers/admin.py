@@ -113,7 +113,8 @@ async def add_employee(employee: EmployeeCreate, current_user: TokenData = Depen
         employee.password,
         employee.designation,
         employee.roles,
-        employee.is_mentor
+        employee.is_mentor,
+        employee.avenger_character 
     )
     
     if not success:
