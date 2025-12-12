@@ -239,7 +239,12 @@ class SheetManager:
             }
         })
 
-        # Mentor Slots (Editable)
+        # Mentor Slots (Editable - Initial values only)
+        # We write them once, but we don't apply the 'color_locked' grey background that implies read-only.
+        # The user requested "editable for employees also".
+        # Currently they are just text cells. User might think they are locked if they look like headers.
+        # We will write them as standard values.
+        
         men_slots = [
             "08:00 - 09:00", "09:00 - 10:00", "10:00 - 11:00", "11:00 - 12:00",
             "12:00 - 01:00", "01:00 - 02:00", "02:00 - 03:00"
@@ -253,6 +258,20 @@ class SheetManager:
                 'start': {'sheetId': sheet_id, 'rowIndex': start_row_men+1, 'columnIndex': 0},
                 'rows': men_rows,
                 'fields': 'userEnteredValue'
+            }
+        })
+        
+        # Explicitly set background to white for these slots to indicate "Editable"
+        requests.append({
+            'repeatCell': {
+                'range': {'sheetId': sheet_id, 'startRowIndex': start_row_men+1, 'endRowIndex': start_row_men+1+len(men_slots), 'startColumnIndex': 0, 'endColumnIndex': 1},
+                'cell': {
+                    'userEnteredFormat': {
+                        'backgroundColor': text_color_white,
+                        'textFormat': {'foregroundColor': {'red': 0, 'green': 0, 'blue': 0}} # Black text
+                    }
+                },
+                'fields': 'userEnteredFormat(backgroundColor,textFormat)'
             }
         })
         
