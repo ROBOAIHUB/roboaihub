@@ -122,6 +122,26 @@ async def add_employee(employee: EmployeeCreate, current_user: TokenData = Depen
     
     return {"status": "success", "message": f"Employee {employee.name} added successfully."}
 
+@router.put("/employees/{emp_id}")
+async def update_employee(emp_id: str, employee: EmployeeUpdate, current_user: TokenData = Depends(get_current_user)):
+    # Verify Admin (TODO)
+    
+    success, msg = user_manager.update_employee(
+        emp_id,
+        name=employee.name,
+        email=employee.email,
+        password=employee.password,
+        designation=employee.designation,
+        roles=employee.roles,
+        is_mentor=employee.is_mentor,
+        # avenger_character=employee.avenger_character # Future TODO
+    )
+    
+    if not success:
+        raise HTTPException(status_code=400, detail=msg)
+    
+    return {"status": "success", "message": f"Employee {emp_id} updated successfully."}
+
 
 
 from backend.schemas import BulkTaskAssignment

@@ -8,6 +8,7 @@ import MentorReporting from './pages/MentorReporting';
 import Layout from './components/Layout';
 import Roles from './pages/Roles';
 import Tasks from './pages/Tasks';
+import Hierarchy from './pages/Hierarchy';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -34,6 +35,7 @@ function App() {
             <Route path="/reporting" element={<Reporting />} />
             <Route path="/mentor-reporting" element={<MentorReporting />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/team" element={<Hierarchy />} />
           </Route>
           <Route path="/" element={<Navigate to="/dashboard" />} />
         </Routes>
