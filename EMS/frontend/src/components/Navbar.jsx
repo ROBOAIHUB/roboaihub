@@ -1,6 +1,8 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import api from '../services/api';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
@@ -13,6 +15,26 @@ const Navbar = () => {
     };
 
     const isActive = (path) => location.pathname === path;
+
+    const [notifications, setNotifications] = useState([]);
+    const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            fetchNotifications();
+            const interval = setInterval(fetchNotifications, 60000); // Poll every 60s
+            return () => clearInterval(interval);
+        }
+    }, [user]);
+
+    const fetchNotifications = async () => {
+        try {
+            const res = await api.get('/users/notifications');
+            setNotifications(res.data);
+        } catch (err) {
+            console.error("Failed to fetch notifications", err);
+        }
+    };
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-space-800/90 backdrop-blur-md border-b border-blue-900 shadow-neon-blue">
@@ -54,6 +76,39 @@ const Navbar = () => {
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
+                        {/* Notification Bell */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowNotifDropdown(!showNotifDropdown)}
+                                className="text-starlight hover:text-neon-blue relative p-1"
+                            >
+                                <span className="text-xl">🔔</span>
+                                {notifications.length > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-neon-red text-white text-[10px] font-bold px-1.5 rounded-full shadow-[0_0_5px_rgba(255,0,0,0.8)]">
+                                        {notifications.length}
+                                    </span>
+                                )}
+                            </button>
+
+                            {showNotifDropdown && (
+                                <div className="absolute right-0 mt-2 w-80 bg-space-900 border border-blue-800 rounded shadow-[0_0_20px_rgba(0,0,0,0.8)] overflow-hidden z-[60]">
+                                    <div className="p-3 border-b border-blue-900 font-bold text-neon-blue">Notifications</div>
+                                    <div className="max-h-64 overflow-y-auto">
+                                        {notifications.length === 0 ? (
+                                            <div className="p-4 text-xs text-starlight opacity-50 text-center">No new notifications.</div>
+                                        ) : (
+                                            notifications.map((n, i) => (
+                                                <div key={i} className="p-3 border-b border-blue-900/30 hover:bg-white/5 transition">
+                                                    <p className="text-sm text-starlight">{n.message}</p>
+                                                    <p className="text-[10px] text-neon-blue mt-1 opacity-70">{n.date}</p>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         <div className="hidden md:block text-right">
                             <p className="text-sm font-bold text-neon-blue">{user?.full_name}</p>
                             <p className="text-xs text-starlight opacity-70">{user?.roles?.[0]}</p>
