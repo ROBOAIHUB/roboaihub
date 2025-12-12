@@ -190,7 +190,11 @@ const Admin = () => {
                             setMsg('Initializing Sequence... Please Wait. ⏳');
                             try {
                                 const res = await api.post('/admin/generate-sheets', { month: m, year: y });
-                                setMsg(`Operation Complete! Success: ${res.data.summary.success}, Skipped: ${res.data.summary.skipped}. ✅`);
+                                if (res.data.summary.message) {
+                                    setMsg(`🚀 ${res.data.summary.message}`);
+                                } else {
+                                    setMsg(`Operation Complete! Success: ${res.data.summary.success}, Skipped: ${res.data.summary.skipped}. ✅`);
+                                }
                             } catch (err) {
                                 console.error(err);
                                 setMsg('Sequence Failed. Check Logs. ❌');
