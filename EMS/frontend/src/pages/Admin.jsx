@@ -299,351 +299,352 @@ const Admin = () => {
                         </p>
                     </div>
                 </div>
+            </div>
 
-                {/* Add Employee Modal */}
-                {
-                    addModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                            <motion.div
-                                initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                                className="bg-space-800 border-2 border-neon-blue rounded-xl p-8 w-full max-w-2xl shadow-[0_0_50px_rgba(0,242,255,0.2)]"
-                            >
-                                <div className="flex justify-between items-center mb-6 border-b border-blue-900 pb-4">
-                                    <h3 className="text-2xl font-tech text-neon-red">Initialize Recruit</h3>
-                                    <button onClick={() => setAddModalOpen(false)} className="text-starlight hover:text-red-500 text-2xl">&times;</button>
-                                </div>
+            {/* Add Employee Modal */}
+            {
+                addModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                            className="bg-space-800 border-2 border-neon-blue rounded-xl p-8 w-full max-w-2xl shadow-[0_0_50px_rgba(0,242,255,0.2)]"
+                        >
+                            <div className="flex justify-between items-center mb-6 border-b border-blue-900 pb-4">
+                                <h3 className="text-2xl font-tech text-neon-red">Initialize Recruit</h3>
+                                <button onClick={() => setAddModalOpen(false)} className="text-starlight hover:text-red-500 text-2xl">&times;</button>
+                            </div>
 
-                                <form onSubmit={handleSubmit} className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <input
-                                            type="text" placeholder="Employee ID" required
-                                            value={formData.emp_id} onChange={e => setFormData({ ...formData, emp_id: e.target.value })}
-                                            className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
-                                        />
-                                        <input
-                                            type="text" placeholder="Full Name" required
-                                            value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                            className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
-                                        />
-                                    </div>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
                                     <input
-                                        type="email" placeholder="Email" required
-                                        value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                        type="text" placeholder="Employee ID" required
+                                        value={formData.emp_id} onChange={e => setFormData({ ...formData, emp_id: e.target.value })}
                                         className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
                                     />
                                     <input
-                                        type="password" placeholder="Password" required
-                                        value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                        type="text" placeholder="Full Name" required
+                                        value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
                                         className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
                                     />
-                                    <input
-                                        type="text" placeholder="Designation" required
-                                        value={formData.designation} onChange={e => setFormData({ ...formData, designation: e.target.value })}
-                                        className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
-                                    />
-
-                                    {/* Avenger Theme Selector */}
-                                    <div>
-                                        <label className="block text-xs text-neon-red mb-1 drop-shadow-[0_0_5px_rgba(255,0,0,0.8)]">Protocol Theme (Avenger)</label>
-                                        <select
-                                            value={formData.avenger_character || "Avengers"}
-                                            onChange={e => setFormData({ ...formData, avenger_character: e.target.value })}
-                                            className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition appearance-none"
-                                        >
-                                            <option value="Avengers">Avengers (Default)</option>
-                                            <option value="Iron Man">Iron Man (Tech/Gold)</option>
-                                            <option value="Captain America">Captain America (Blue/Star)</option>
-                                            <option value="Thor">Thor (Lightning/Storm)</option>
-                                            <option value="Hulk">Hulk (Green/Radiation)</option>
-                                            <option value="Black Widow">Black Widow (Stealth/Red)</option>
-                                            <option value="Hawkeye">Hawkeye (Precision/Purple)</option>
-                                            <option value="Spider Man">Spider Man (Web/Red-Blue)</option>
-                                            <option value="Dr. Strange">Dr. Strange (Mystic/Orange-Purple)</option>
-                                            <option value="Black Panther">Black Panther (Vibranium/Purple)</option>
-                                            <option value="Ant Man">Ant Man (Quantum/Red)</option>
-                                            <option value="Star Lord">Star Lord (Galaxy/Purple)</option>
-                                            <option value="Groot">Groot (Nature/Brown)</option>
-                                            <option value="Rocket">Rocket (Tech/Orange)</option>
-                                            <option value="Vision">Vision (Mind Stone/Yellow)</option>
-                                            <option value="Scarlet Witch">Scarlet Witch (Chaos/Red)</option>
-                                            <option value="Falcon">Falcon (Air/Red-White)</option>
-                                            <option value="Winter Soldier">Winter Soldier (Metal/Silver)</option>
-                                            <option value="Loki">Loki (Mischief/Green)</option>
-                                            <option value="Thanos">Thanos (Power/Gold)</option>
-                                            <option value="Deadpool">Deadpool (Chaos/Red-Black)</option>
-                                            <option value="Wolverine">Wolverine (Adamantium/Yellow)</option>
-                                            <option value="Dr. Doom">Dr. Doom (Magic/Green)</option>
-                                            <option value="Riri Williams">Ironheart (NextGen/Pink)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs text-neon-red mb-1 drop-shadow-[0_0_5px_rgba(255,0,0,0.8)]">Role & Responsibility</label>
-                                        <textarea
-                                            placeholder="E.g. Frontend, Backend (comma separated)" required
-                                            value={formData.roles} onChange={e => setFormData({ ...formData, roles: e.target.value })}
-                                            className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] h-24 focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
-                                        />
-                                    </div>
-                                    <label className="flex items-center gap-2 text-starlight cursor-pointer p-2 border border-blue-900/50 rounded hover:bg-blue-900/20">
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.is_mentor}
-                                            onChange={e => setFormData({ ...formData, is_mentor: e.target.checked })}
-                                            className="accent-neon-red w-5 h-5"
-                                        />
-                                        Assign as Mentor
-                                    </label>
-                                    <button type="submit" className="w-full py-4 bg-neon-red text-white font-bold rounded hover:bg-neon-red/80 transition shadow-[0_0_15px_rgba(255,0,0,0.4)] uppercase tracking-wider">
-                                        ADD TO DATABASE
-                                    </button>
-                                </form>
-                            </motion.div>
-                        </div>
-                    )
-                }
-
-                {/* Task Assignment Modal */}
-                {
-                    taskModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                            <motion.div
-                                initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                                className="bg-space-800 border-2 border-neon-blue rounded-xl p-6 w-full max-w-4xl shadow-[0_0_50px_rgba(0,242,255,0.2)] max-h-[90vh] overflow-y-auto"
-                            >
-                                <div className="flex justify-between items-center mb-6 border-b border-blue-900 pb-4">
-                                    <h3 className="text-2xl font-tech text-white">Assign Tasks: <span className="text-neon-blue">{selectedEmp?.name}</span></h3>
-                                    <button onClick={() => setTaskModalOpen(false)} className="text-starlight hover:text-neon-red text-2xl">&times;</button>
                                 </div>
+                                <input
+                                    type="email" placeholder="Email" required
+                                    value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                    className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
+                                />
+                                <input
+                                    type="password" placeholder="Password" required
+                                    value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                    className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
+                                />
+                                <input
+                                    type="text" placeholder="Designation" required
+                                    value={formData.designation} onChange={e => setFormData({ ...formData, designation: e.target.value })}
+                                    className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
+                                />
 
-                                <div className="mb-6">
-                                    <label className="block text-sm text-neon-blue mb-2">Task Date</label>
-                                    <input
-                                        type="date"
-                                        value={taskData.date}
-                                        onChange={(e) => setTaskData({ ...taskData, date: e.target.value })}
-                                        className="bg-space-900 border border-blue-800 text-white p-2 rounded"
+                                {/* Avenger Theme Selector */}
+                                <div>
+                                    <label className="block text-xs text-neon-red mb-1 drop-shadow-[0_0_5px_rgba(255,0,0,0.8)]">Protocol Theme (Avenger)</label>
+                                    <select
+                                        value={formData.avenger_character || "Avengers"}
+                                        onChange={e => setFormData({ ...formData, avenger_character: e.target.value })}
+                                        className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition appearance-none"
+                                    >
+                                        <option value="Avengers">Avengers (Default)</option>
+                                        <option value="Iron Man">Iron Man (Tech/Gold)</option>
+                                        <option value="Captain America">Captain America (Blue/Star)</option>
+                                        <option value="Thor">Thor (Lightning/Storm)</option>
+                                        <option value="Hulk">Hulk (Green/Radiation)</option>
+                                        <option value="Black Widow">Black Widow (Stealth/Red)</option>
+                                        <option value="Hawkeye">Hawkeye (Precision/Purple)</option>
+                                        <option value="Spider Man">Spider Man (Web/Red-Blue)</option>
+                                        <option value="Dr. Strange">Dr. Strange (Mystic/Orange-Purple)</option>
+                                        <option value="Black Panther">Black Panther (Vibranium/Purple)</option>
+                                        <option value="Ant Man">Ant Man (Quantum/Red)</option>
+                                        <option value="Star Lord">Star Lord (Galaxy/Purple)</option>
+                                        <option value="Groot">Groot (Nature/Brown)</option>
+                                        <option value="Rocket">Rocket (Tech/Orange)</option>
+                                        <option value="Vision">Vision (Mind Stone/Yellow)</option>
+                                        <option value="Scarlet Witch">Scarlet Witch (Chaos/Red)</option>
+                                        <option value="Falcon">Falcon (Air/Red-White)</option>
+                                        <option value="Winter Soldier">Winter Soldier (Metal/Silver)</option>
+                                        <option value="Loki">Loki (Mischief/Green)</option>
+                                        <option value="Thanos">Thanos (Power/Gold)</option>
+                                        <option value="Deadpool">Deadpool (Chaos/Red-Black)</option>
+                                        <option value="Wolverine">Wolverine (Adamantium/Yellow)</option>
+                                        <option value="Dr. Doom">Dr. Doom (Magic/Green)</option>
+                                        <option value="Riri Williams">Ironheart (NextGen/Pink)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-neon-red mb-1 drop-shadow-[0_0_5px_rgba(255,0,0,0.8)]">Role & Responsibility</label>
+                                    <textarea
+                                        placeholder="E.g. Frontend, Backend (comma separated)" required
+                                        value={formData.roles} onChange={e => setFormData({ ...formData, roles: e.target.value })}
+                                        className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] h-24 focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
                                     />
                                 </div>
+                                <label className="flex items-center gap-2 text-starlight cursor-pointer p-2 border border-blue-900/50 rounded hover:bg-blue-900/20">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.is_mentor}
+                                        onChange={e => setFormData({ ...formData, is_mentor: e.target.checked })}
+                                        className="accent-neon-red w-5 h-5"
+                                    />
+                                    Assign as Mentor
+                                </label>
+                                <button type="submit" className="w-full py-4 bg-neon-red text-white font-bold rounded hover:bg-neon-red/80 transition shadow-[0_0_15px_rgba(255,0,0,0.4)] uppercase tracking-wider">
+                                    ADD TO DATABASE
+                                </button>
+                            </form>
+                        </motion.div>
+                    </div>
+                )
+            }
 
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-sm text-starlight">
-                                        <thead className="bg-blue-900/30 text-neon-blue uppercase">
-                                            <tr>
-                                                <th className="p-3">Priority</th>
-                                                <th className="p-3 w-1/3">Task</th>
-                                                <th className="p-3">Expected Time</th>
-                                                <th className="p-3">Deadline</th>
+            {/* Task Assignment Modal */}
+            {
+                taskModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                            className="bg-space-800 border-2 border-neon-blue rounded-xl p-6 w-full max-w-4xl shadow-[0_0_50px_rgba(0,242,255,0.2)] max-h-[90vh] overflow-y-auto"
+                        >
+                            <div className="flex justify-between items-center mb-6 border-b border-blue-900 pb-4">
+                                <h3 className="text-2xl font-tech text-white">Assign Tasks: <span className="text-neon-blue">{selectedEmp?.name}</span></h3>
+                                <button onClick={() => setTaskModalOpen(false)} className="text-starlight hover:text-neon-red text-2xl">&times;</button>
+                            </div>
+
+                            <div className="mb-6">
+                                <label className="block text-sm text-neon-blue mb-2">Task Date</label>
+                                <input
+                                    type="date"
+                                    value={taskData.date}
+                                    onChange={(e) => setTaskData({ ...taskData, date: e.target.value })}
+                                    className="bg-space-900 border border-blue-800 text-white p-2 rounded"
+                                />
+                            </div>
+
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm text-starlight">
+                                    <thead className="bg-blue-900/30 text-neon-blue uppercase">
+                                        <tr>
+                                            <th className="p-3">Priority</th>
+                                            <th className="p-3 w-1/3">Task</th>
+                                            <th className="p-3">Expected Time</th>
+                                            <th className="p-3">Deadline</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-blue-900/30">
+                                        {taskData.tasks.map((task, index) => (
+                                            <tr key={index} className="hover:bg-blue-900/10 transition">
+                                                <td className="p-2">
+                                                    <select
+                                                        value={task.priority}
+                                                        onChange={(e) => handleTaskChange(index, 'priority', e.target.value)}
+                                                        className="bg-space-900 border border-blue-800 rounded p-2 text-white w-full"
+                                                    >
+                                                        <option>High</option>
+                                                        <option>Medium</option>
+                                                        <option>Low</option>
+                                                    </select>
+                                                </td>
+                                                <td className="p-2">
+                                                    <input
+                                                        type="text" placeholder="Description of the mission"
+                                                        value={task.task}
+                                                        onChange={(e) => handleTaskChange(index, 'task', e.target.value)}
+                                                        className="bg-space-900 border border-blue-800 rounded p-2 text-white w-full"
+                                                    />
+                                                </td>
+                                                <td className="p-2">
+                                                    <input
+                                                        type="text" placeholder="e.g. 2h 30m"
+                                                        value={task.expected_time}
+                                                        onChange={(e) => handleTaskChange(index, 'expected_time', e.target.value)}
+                                                        className="bg-space-900 border border-blue-800 rounded p-2 text-white w-full"
+                                                    />
+                                                </td>
+                                                <td className="p-2">
+                                                    <input
+                                                        type="date"
+                                                        value={task.deadline}
+                                                        onChange={(e) => handleTaskChange(index, 'deadline', e.target.value)}
+                                                        className="bg-space-900 border border-blue-800 rounded p-2 text-white w-full"
+                                                    />
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-blue-900/30">
-                                            {taskData.tasks.map((task, index) => (
-                                                <tr key={index} className="hover:bg-blue-900/10 transition">
-                                                    <td className="p-2">
-                                                        <select
-                                                            value={task.priority}
-                                                            onChange={(e) => handleTaskChange(index, 'priority', e.target.value)}
-                                                            className="bg-space-900 border border-blue-800 rounded p-2 text-white w-full"
-                                                        >
-                                                            <option>High</option>
-                                                            <option>Medium</option>
-                                                            <option>Low</option>
-                                                        </select>
-                                                    </td>
-                                                    <td className="p-2">
-                                                        <input
-                                                            type="text" placeholder="Description of the mission"
-                                                            value={task.task}
-                                                            onChange={(e) => handleTaskChange(index, 'task', e.target.value)}
-                                                            className="bg-space-900 border border-blue-800 rounded p-2 text-white w-full"
-                                                        />
-                                                    </td>
-                                                    <td className="p-2">
-                                                        <input
-                                                            type="text" placeholder="e.g. 2h 30m"
-                                                            value={task.expected_time}
-                                                            onChange={(e) => handleTaskChange(index, 'expected_time', e.target.value)}
-                                                            className="bg-space-900 border border-blue-800 rounded p-2 text-white w-full"
-                                                        />
-                                                    </td>
-                                                    <td className="p-2">
-                                                        <input
-                                                            type="date"
-                                                            value={task.deadline}
-                                                            onChange={(e) => handleTaskChange(index, 'deadline', e.target.value)}
-                                                            className="bg-space-900 border border-blue-800 rounded p-2 text-white w-full"
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
 
-                                <div className="flex gap-4 mt-6">
-                                    <button
-                                        onClick={addTaskRow}
-                                        className="px-4 py-2 border border-neon-blue text-neon-blue rounded hover:bg-neon-blue hover:text-black transition uppercase text-sm font-bold"
-                                    >
-                                        + Add Task Row
-                                    </button>
-                                    <button
-                                        onClick={submitTasks}
-                                        className="flex-1 px-4 py-2 bg-gradient-to-r from-neon-red to-red-800 text-white rounded font-bold uppercase hover:shadow-[0_0_20px_rgba(255,0,0,0.4)] transition"
-                                    >
-                                        Dispatch Assignment
-                                    </button>
-                                </div>
+                            <div className="flex gap-4 mt-6">
+                                <button
+                                    onClick={addTaskRow}
+                                    className="px-4 py-2 border border-neon-blue text-neon-blue rounded hover:bg-neon-blue hover:text-black transition uppercase text-sm font-bold"
+                                >
+                                    + Add Task Row
+                                </button>
+                                <button
+                                    onClick={submitTasks}
+                                    className="flex-1 px-4 py-2 bg-gradient-to-r from-neon-red to-red-800 text-white rounded font-bold uppercase hover:shadow-[0_0_20px_rgba(255,0,0,0.4)] transition"
+                                >
+                                    Dispatch Assignment
+                                </button>
+                            </div>
 
-                                {/* Personal Notification Section */}
-                                <div className="mt-8 pt-6 border-t border-blue-900/50">
-                                    <h4 className="text-lg text-neon-blue mb-4 font-bold">📨 Direct Message</h4>
-                                    <div className="flex gap-4">
-                                        <input
-                                            type="text"
-                                            id="personalMsg"
-                                            placeholder={`Message for ${selectedEmp?.name}...`}
-                                            className="flex-1 bg-space-900 border border-blue-800 text-white p-2 rounded focus:border-neon-blue focus:outline-none"
-                                        />
-                                        <button
-                                            onClick={async () => {
-                                                const msgText = document.getElementById('personalMsg').value;
-                                                if (!msgText) return alert("Please enter a message");
-
-                                                setMsg(`Sending to ${selectedEmp?.name}... 📨`);
-                                                try {
-                                                    await api.post('/admin/notifications', { message: msgText, target_emp_id: selectedEmp.id });
-                                                    setMsg(`Message sent to ${selectedEmp?.name}! ✅`);
-                                                    document.getElementById('personalMsg').value = '';
-                                                } catch (err) {
-                                                    console.error(err);
-                                                    setMsg('Failed to send message. ❌');
-                                                }
-                                            }}
-                                            className="px-4 py-2 bg-blue-900/50 border border-neon-blue text-neon-blue font-bold rounded hover:bg-neon-blue hover:text-black transition uppercase tracking-wider"
-                                        >
-                                            Send
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* View Previous Report Section within Task Modal */}
-                                <div className="mt-8 pt-6 border-t border-blue-900/50 flex flex-col items-center gap-4">
-                                    <button
-                                        onClick={() => viewPreviousReport(selectedEmp.id)}
-                                        className="px-6 py-2 bg-space-900 border border-yellow-500/50 text-yellow-500 rounded hover:bg-yellow-500/20 transition uppercase text-sm font-bold shadow-[0_0_10px_rgba(255,215,0,0.2)]"
-                                    >
-                                        📜 View Previous Day Assignment/Report
-                                    </button>
-                                </div>
-
-                                {/* Remove Employee Button at Bottom */}
-                                <div className="mt-8 pt-6 border-t border-red-900/30 flex justify-center">
+                            {/* Personal Notification Section */}
+                            <div className="mt-8 pt-6 border-t border-blue-900/50">
+                                <h4 className="text-lg text-neon-blue mb-4 font-bold">📨 Direct Message</h4>
+                                <div className="flex gap-4">
+                                    <input
+                                        type="text"
+                                        id="personalMsg"
+                                        placeholder={`Message for ${selectedEmp?.name}...`}
+                                        className="flex-1 bg-space-900 border border-blue-800 text-white p-2 rounded focus:border-neon-blue focus:outline-none"
+                                    />
                                     <button
                                         onClick={async () => {
-                                            if (window.confirm(`Are you sure you want to PERMANENTLY REMOVE ${selectedEmp.name} (${selectedEmp.id}) from the system?`)) {
-                                                try {
-                                                    await api.delete(`/admin/employees/${selectedEmp.id}`);
-                                                    setMsg(`Employee ${selectedEmp.name} Removed. 🗑️`);
-                                                    setTaskModalOpen(false);
-                                                    fetchEmployees();
-                                                } catch (err) {
-                                                    console.error(err);
-                                                    setMsg('Failed to remove employee. ❌');
-                                                }
+                                            const msgText = document.getElementById('personalMsg').value;
+                                            if (!msgText) return alert("Please enter a message");
+
+                                            setMsg(`Sending to ${selectedEmp?.name}... 📨`);
+                                            try {
+                                                await api.post('/admin/notifications', { message: msgText, target_emp_id: selectedEmp.id });
+                                                setMsg(`Message sent to ${selectedEmp?.name}! ✅`);
+                                                document.getElementById('personalMsg').value = '';
+                                            } catch (err) {
+                                                console.error(err);
+                                                setMsg('Failed to send message. ❌');
                                             }
                                         }}
-                                        className="px-6 py-3 bg-red-950/50 border border-red-800 text-red-500 rounded hover:bg-red-900/80 hover:text-white transition uppercase text-sm font-bold shadow-[0_0_15px_rgba(255,0,0,0.2)] flex items-center gap-2"
+                                        className="px-4 py-2 bg-blue-900/50 border border-neon-blue text-neon-blue font-bold rounded hover:bg-neon-blue hover:text-black transition uppercase tracking-wider"
                                     >
-                                        🗑️ Remove Employee
+                                        Send
                                     </button>
                                 </div>
+                            </div>
 
-                            </motion.div>
-                        </div>
-                    )
-                }
+                            {/* View Previous Report Section within Task Modal */}
+                            <div className="mt-8 pt-6 border-t border-blue-900/50 flex flex-col items-center gap-4">
+                                <button
+                                    onClick={() => viewPreviousReport(selectedEmp.id)}
+                                    className="px-6 py-2 bg-space-900 border border-yellow-500/50 text-yellow-500 rounded hover:bg-yellow-500/20 transition uppercase text-sm font-bold shadow-[0_0_10px_rgba(255,215,0,0.2)]"
+                                >
+                                    📜 View Previous Day Assignment/Report
+                                </button>
+                            </div>
 
-                {/* Report Viewer Modal */}
-                {
-                    reportModalOpen && (
-                        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
-                            <motion.div
-                                initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                                className="bg-space-800 border-2 border-yellow-500/50 rounded-xl p-6 w-full max-w-5xl shadow-[0_0_50px_rgba(255,215,0,0.2)] max-h-[90vh] overflow-y-auto"
-                            >
-                                <div className="flex justify-between items-center mb-6 border-b border-yellow-900/50 pb-4">
-                                    <div>
-                                        <h3 className="text-2xl font-tech text-yellow-500">Mission Report Log</h3>
-                                        <p className="text-sm text-starlight opacity-70">Operative: {selectedEmp?.name} | Date: {reportData?.date}</p>
-                                    </div>
-                                    <button onClick={() => setReportModalOpen(false)} className="text-starlight hover:text-red-500 text-2xl">&times;</button>
+                            {/* Remove Employee Button at Bottom */}
+                            <div className="mt-8 pt-6 border-t border-red-900/30 flex justify-center">
+                                <button
+                                    onClick={async () => {
+                                        if (window.confirm(`Are you sure you want to PERMANENTLY REMOVE ${selectedEmp.name} (${selectedEmp.id}) from the system?`)) {
+                                            try {
+                                                await api.delete(`/admin/employees/${selectedEmp.id}`);
+                                                setMsg(`Employee ${selectedEmp.name} Removed. 🗑️`);
+                                                setTaskModalOpen(false);
+                                                fetchEmployees();
+                                            } catch (err) {
+                                                console.error(err);
+                                                setMsg('Failed to remove employee. ❌');
+                                            }
+                                        }
+                                    }}
+                                    className="px-6 py-3 bg-red-950/50 border border-red-800 text-red-500 rounded hover:bg-red-900/80 hover:text-white transition uppercase text-sm font-bold shadow-[0_0_15px_rgba(255,0,0,0.2)] flex items-center gap-2"
+                                >
+                                    🗑️ Remove Employee
+                                </button>
+                            </div>
+
+                        </motion.div>
+                    </div>
+                )
+            }
+
+            {/* Report Viewer Modal */}
+            {
+                reportModalOpen && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                            className="bg-space-800 border-2 border-yellow-500/50 rounded-xl p-6 w-full max-w-5xl shadow-[0_0_50px_rgba(255,215,0,0.2)] max-h-[90vh] overflow-y-auto"
+                        >
+                            <div className="flex justify-between items-center mb-6 border-b border-yellow-900/50 pb-4">
+                                <div>
+                                    <h3 className="text-2xl font-tech text-yellow-500">Mission Report Log</h3>
+                                    <p className="text-sm text-starlight opacity-70">Operative: {selectedEmp?.name} | Date: {reportData?.date}</p>
                                 </div>
+                                <button onClick={() => setReportModalOpen(false)} className="text-starlight hover:text-red-500 text-2xl">&times;</button>
+                            </div>
 
-                                {!reportData?.found ? (
-                                    <div className="p-8 text-center text-red-400 border border-dashed border-red-900 rounded bg-red-900/10">
-                                        ⚠️ No Mission Report found for this date.
+                            {!reportData?.found ? (
+                                <div className="p-8 text-center text-red-400 border border-dashed border-red-900 rounded bg-red-900/10">
+                                    ⚠️ No Mission Report found for this date.
+                                </div>
+                            ) : (
+                                <div className="space-y-8">
+                                    {/* Office Report */}
+                                    <div>
+                                        <h4 className="text-lg text-neon-blue mb-2 font-bold border-l-4 border-neon-blue pl-3">OFFICE PROTOCOLS</h4>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left text-xs bg-space-900 border border-blue-900">
+                                                <thead className="bg-blue-900/30 text-neon-blue">
+                                                    <tr>
+                                                        <th className="p-2">Time Slot</th>
+                                                        <th className="p-2">Task</th>
+                                                        <th className="p-2">Description</th>
+                                                        <th className="p-2">Status</th>
+                                                        <th className="p-2">Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-blue-900/20 text-starlight">
+                                                    {reportData.office.map((row, i) => (
+                                                        <tr key={i} className="hover:bg-white/5">
+                                                            {row.map((cell, j) => <td key={j} className="p-2 border-r border-blue-900/20">{cell}</td>)}
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                ) : (
-                                    <div className="space-y-8">
-                                        {/* Office Report */}
+
+                                    {/* Mentor Report */}
+                                    {reportData.mentor.length > 0 && (
                                         <div>
-                                            <h4 className="text-lg text-neon-blue mb-2 font-bold border-l-4 border-neon-blue pl-3">OFFICE PROTOCOLS</h4>
+                                            <h4 className="text-lg text-neon-red mb-2 font-bold border-l-4 border-neon-red pl-3">MENTORSHIP LOGS</h4>
                                             <div className="overflow-x-auto">
-                                                <table className="w-full text-left text-xs bg-space-900 border border-blue-900">
-                                                    <thead className="bg-blue-900/30 text-neon-blue">
+                                                <table className="w-full text-left text-xs bg-space-900 border border-red-900">
+                                                    <thead className="bg-red-900/30 text-neon-red">
                                                         <tr>
                                                             <th className="p-2">Time Slot</th>
-                                                            <th className="p-2">Task</th>
-                                                            <th className="p-2">Description</th>
-                                                            <th className="p-2">Status</th>
+                                                            <th className="p-2">Grade</th>
+                                                            <th className="p-2">Topics</th>
+                                                            <th className="p-2">Activity</th>
                                                             <th className="p-2">Remarks</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody className="divide-y divide-blue-900/20 text-starlight">
-                                                        {reportData.office.map((row, i) => (
+                                                    <tbody className="divide-y divide-red-900/20 text-starlight">
+                                                        {reportData.mentor.map((row, i) => (
                                                             <tr key={i} className="hover:bg-white/5">
-                                                                {row.map((cell, j) => <td key={j} className="p-2 border-r border-blue-900/20">{cell}</td>)}
+                                                                {row.map((cell, j) => <td key={j} className="p-2 border-r border-red-900/20">{cell}</td>)}
                                                             </tr>
                                                         ))}
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
-
-                                        {/* Mentor Report */}
-                                        {reportData.mentor.length > 0 && (
-                                            <div>
-                                                <h4 className="text-lg text-neon-red mb-2 font-bold border-l-4 border-neon-red pl-3">MENTORSHIP LOGS</h4>
-                                                <div className="overflow-x-auto">
-                                                    <table className="w-full text-left text-xs bg-space-900 border border-red-900">
-                                                        <thead className="bg-red-900/30 text-neon-red">
-                                                            <tr>
-                                                                <th className="p-2">Time Slot</th>
-                                                                <th className="p-2">Grade</th>
-                                                                <th className="p-2">Topics</th>
-                                                                <th className="p-2">Activity</th>
-                                                                <th className="p-2">Remarks</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className="divide-y divide-red-900/20 text-starlight">
-                                                            {reportData.mentor.map((row, i) => (
-                                                                <tr key={i} className="hover:bg-white/5">
-                                                                    {row.map((cell, j) => <td key={j} className="p-2 border-r border-red-900/20">{cell}</td>)}
-                                                                </tr>
-                                                            ))}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </motion.div>
-                        </div>
-                    )
-                }
-            </div >
-            );
+                                    )}
+                                </div>
+                            )}
+                        </motion.div>
+                    </div>
+                )
+            }
+        </div >
+    );
 };
 
-            export default Admin;
+export default Admin;
