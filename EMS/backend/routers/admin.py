@@ -362,14 +362,7 @@ async def send_notification(
         raise HTTPException(status_code=400, detail="Target ID or 'all' required")
         
     return {"status": "success", "message": msg, "summary": summary}
-        request.month, 
-        request.year
-    )
-    
-    return {
-        "status": "success", 
-        "message": f"Generating sheets for {emp_data['name']} in background. Check Logs/Drive in 1-2 mins."
-    }
+
 
 @router.post("/sync-drive")
 async def sync_drive(current_user: TokenData = Depends(get_current_user)):
