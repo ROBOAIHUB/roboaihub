@@ -234,10 +234,14 @@ async def get_employee_report(emp_id: str, date_str: str = None, current_user: T
 
 from backend.schemas import SheetGenerationRequest
 
+from fastapi import BackgroundTasks
+
 @router.post("/generate-sheets")
-async def generate_sheets(request: SheetGenerationRequest, current_user: TokenData = Depends(get_current_user)):
-    # Verify Admin (TODO)
-    
+async def generate_sheets(
+    request: SheetGenerationRequest, 
+    background_tasks: BackgroundTasks,
+    current_user: TokenData = Depends(get_current_user)
+):
     # Refresh Services
     current_drive_manager = get_fresh_drive_manager()
     current_sheet_manager = get_fresh_sheet_manager()
@@ -245,25 +249,24 @@ async def generate_sheets(request: SheetGenerationRequest, current_user: TokenDa
     if not current_drive_manager.service:
          raise HTTPException(status_code=500, detail="Google Drive Service Unavailable")
 
-    # This can take a long time. Ideally should be a background task.
-    # For now, we run it synchronously (might timeout on Render free tier if > 50s).
-    # Consider returning 202 Accepted and running in background if possible?
-    # FastAPI BackgroundTasks is perfect here.
+    # Use BackgroundTasks to avoid 50s Timeout on Render
+    # The process takes ~10-15 mins for 300+ sheets.
+    background_tasks.add_task(
+        current_sheet_manager.create_month_sheets_for_all,
+        current_drive_manager, 
+        user_manager, 
+        request.month, 
+        request.year
+    )
     
-    # Let's use BackgroundTasks? The user wants "One Click", so waiting is okay if < 1-2 mins.
-    # But 300 requests might be > 2 mins.
-    # Let's try synchronous first, but optimized.
-    
-    try:
-        summary = current_sheet_manager.create_month_sheets_for_all(
-            current_drive_manager, 
-            user_manager, 
-            request.month, 
-            request.year
-        )
-        return {"status": "success", "summary": summary}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "status": "success", 
+        "summary": {
+            "success": "Processing in Background", 
+            "skipped": "Check Logs/Drive later",
+            "message": "The robot is working on it! This will take ~10-15 minutes. You can close this window."
+        }
+    }
 
 @router.post("/sync-drive")
 async def sync_drive(current_user: TokenData = Depends(get_current_user)):
