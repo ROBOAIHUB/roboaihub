@@ -19,9 +19,8 @@ const Admin = () => {
         tasks: [{ priority: 'Medium', task: '', expected_time: '', deadline: '' }]
     });
 
-    const [reportModalOpen, setReportModalOpen] = useState(false);
-    const [reportData, setReportData] = useState(null);
-    const [reportDate, setReportDate] = useState('');
+    const [sheetMonth, setSheetMonth] = useState(new Date().getMonth() + 1);
+    const [sheetYear, setSheetYear] = useState(new Date().getFullYear());
 
     useEffect(() => {
         fetchEmployees();
@@ -35,6 +34,23 @@ const Admin = () => {
             console.error("Failed to fetch employees", err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleGenerateSingle = async (e, empId, empName) => {
+        e.stopPropagation(); // prevent opening modal
+        if (!window.confirm(`Generate sheets for ${empName} for ${sheetMonth}/${sheetYear}?`)) return;
+
+        setMsg(`Generating sheets for ${empName}... ⏳`);
+        try {
+            const res = await api.post(`/admin/employees/${empId}/generate-sheets`, {
+                month: parseInt(sheetMonth),
+                year: parseInt(sheetYear)
+            });
+            setMsg(`🚀 ${res.data.message}`);
+        } catch (err) {
+            console.error(err);
+            setMsg('Generation Failed. Check Logs. ❌');
         }
     };
 
@@ -130,21 +146,30 @@ const Admin = () => {
             {/* Employee List (Full Width) */}
             <div className="bg-space-800 p-6 rounded-xl border border-blue-900 shadow-neon-blue overflow-y-auto max-h-[800px]">
                 <h3 className="text-xl text-neon-blue mb-4">Active Personnel</h3>
-                <p className="text-xs text-starlight opacity-50 mb-4">Click on an employee to assign tasks.</p>
+                <p className="text-xs text-starlight opacity-50 mb-4">Click card to assign tasks. Use ⚡ to generate sheets.</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {Object.entries(employees).map(([id, emp]) => (
                         <motion.div
                             key={id}
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                             onClick={() => openTaskModal(id, emp.name)}
-                            className="p-4 bg-space-900 border border-blue-800 rounded hover:border-neon-blue hover:shadow-[0_0_10px_rgba(0,242,255,0.3)] transition cursor-pointer group"
+                            className="p-4 bg-space-900 border border-blue-800 rounded hover:border-neon-blue hover:shadow-[0_0_10px_rgba(0,242,255,0.3)] transition cursor-pointer group relative"
                         >
                             <div className="flex justify-between items-start">
                                 <div>
                                     <h4 className="text-neon-blue font-bold group-hover:text-white transition">{emp.name} <span className="text-xs text-starlight opacity-70">({id})</span></h4>
                                     <p className="text-xs text-starlight opacity-70">{emp.designation}</p>
                                 </div>
-                                {emp.is_mentor && <span className="text-[10px] bg-neon-red text-white px-2 py-1 rounded tracking-wider shadow-[0_0_5px_rgba(255,0,0,0.5)]">MENTOR</span>}
+                                <div className="flex flex-col items-end gap-2">
+                                    {emp.is_mentor && <span className="text-[10px] bg-neon-red text-white px-2 py-1 rounded tracking-wider shadow-[0_0_5px_rgba(255,0,0,0.5)]">MENTOR</span>}
+                                    <button
+                                        onClick={(e) => handleGenerateSingle(e, id, emp.name)}
+                                        title="Generate Sheets for this user"
+                                        className="text-yellow-500 hover:text-white hover:bg-yellow-500/20 p-1 rounded transition"
+                                    >
+                                        ⚡
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     ))}
@@ -161,8 +186,9 @@ const Admin = () => {
                         <label className="block text-xs text-starlight mb-1">Target Month</label>
                         <select
                             id="sheetMonth"
+                            value={sheetMonth}
+                            onChange={(e) => setSheetMonth(e.target.value)}
                             className="bg-space-900 border border-blue-800 text-white p-3 rounded w-32 focus:border-neon-blue focus:outline-none"
-                            defaultValue={new Date().getMonth() + 1}
                         >
                             {Array.from({ length: 12 }, (_, i) => (
                                 <option key={i} value={i + 1}>{new Date(0, i).toLocaleString('default', { month: 'long' })}</option>
@@ -173,8 +199,9 @@ const Admin = () => {
                         <label className="block text-xs text-starlight mb-1">Target Year</label>
                         <select
                             id="sheetYear"
+                            value={sheetYear}
+                            onChange={(e) => setSheetYear(e.target.value)}
                             className="bg-space-900 border border-blue-800 text-white p-3 rounded w-24 focus:border-neon-blue focus:outline-none"
-                            defaultValue={new Date().getFullYear()}
                         >
                             <option value={2024}>2024</option>
                             <option value={2025}>2025</option>
@@ -183,13 +210,11 @@ const Admin = () => {
                     </div>
                     <button
                         onClick={async () => {
-                            const m = parseInt(document.getElementById('sheetMonth').value);
-                            const y = parseInt(document.getElementById('sheetYear').value);
-                            if (!window.confirm(`Initialize Bulk Sheet Generation for ${m}/${y}? This may take 2-3 minutes.`)) return;
+                            if (!window.confirm(`Initialize Bulk Sheet Generation for ${sheetMonth}/${sheetYear}? This may take 2-3 minutes.`)) return;
 
                             setMsg('Initializing Sequence... Please Wait. ⏳');
                             try {
-                                const res = await api.post('/admin/generate-sheets', { month: m, year: y });
+                                const res = await api.post('/admin/generate-sheets', { month: parseInt(sheetMonth), year: parseInt(sheetYear) });
                                 if (res.data.summary.message) {
                                     setMsg(`🚀 ${res.data.summary.message}`);
                                 } else {
