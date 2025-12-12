@@ -51,6 +51,10 @@ class BulkTaskAssignment(BaseModel):
     date: str  # YYYY-MM-DD
     tasks: List[TaskAssignment]
 
+class NotificationCreate(BaseModel):
+    message: str
+    target_emp_id: Optional[str] = "all" # 'all' or specific emp_id
+
 class SheetGenerationRequest(BaseModel):
     month: int
     year: int

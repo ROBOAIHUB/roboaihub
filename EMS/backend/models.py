@@ -22,3 +22,4 @@ class User(BaseModel):
     roles: List[str] = []
     designation: Optional[str] = None
     avenger_character: Optional[str] = "Avengers"
+    notifications: List[dict] = []

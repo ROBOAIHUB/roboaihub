@@ -297,7 +297,51 @@ async def generate_sheets_for_employee(
         current_sheet_manager.create_month_sheets_for_employee,
         current_drive_manager, 
         emp_data['name'],
-        emp_data['folder_id'],
+        request.year
+    )
+    
+    return {
+        "status": "success", 
+        "message": f"Generating sheets for {emp_data['name']} in background. Check Logs/Drive in 1-2 mins."
+    }
+
+from backend.schemas import NotificationCreate
+
+@router.post("/notifications")
+async def send_notification(
+    notif: NotificationCreate,
+    current_user: TokenData = Depends(get_current_user)
+):
+    # Verify Admin (TODO)
+    
+    summary = {"success": 0, "failed": 0, "users": []}
+    
+    if notif.target_emp_id == "all":
+        employees = user_manager.get_all_employees()
+        total = 0
+        for emp_id, emp_data in employees.items():
+            if emp_id == "RAH-000": continue # Optional: Skip Master Admin from broadcast
+            
+            success, msg = user_manager.add_notification(emp_id, notif.message)
+            if success:
+                total += 1
+            else:
+                summary["failed"] += 1
+        summary["success"] = total
+        msg = f"Broadcast sent to {total} members."
+        
+    elif notif.target_emp_id:
+        success, msg = user_manager.add_notification(notif.target_emp_id, notif.message)
+        if success:
+            summary["success"] = 1
+            summary["users"].append(notif.target_emp_id)
+            msg = f"Notification sent to {notif.target_emp_id}"
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
+    else:
+        raise HTTPException(status_code=400, detail="Target ID or 'all' required")
+        
+    return {"status": "success", "message": msg, "summary": summary}
         request.month, 
         request.year
     )

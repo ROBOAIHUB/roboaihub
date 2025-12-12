@@ -19,6 +19,8 @@ user_manager = UserManager()
 
 app.include_router(reports.router)
 app.include_router(admin.router)
+from backend.routers import users
+app.include_router(users.router)
 
 # CORS Configuration
 origins = [
