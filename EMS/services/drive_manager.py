@@ -102,13 +102,12 @@ class DriveManager:
                 summary["errors"].append("Could not find/create EMS_Root")
                 return summary
 
-            # AUTO-SHARE FIX: Share Root with Master Admin to ensure visibility
+            # AUTO-SHARE FIX: Share Root with Admin/User to ensure visibility
             try:
-                # hardcoded for now or fetch from user_manager (safer to fetch)
-                admin = user_manager.users.get('RAH-000')
-                if admin and admin.get('email'):
-                    print(f"DEBUG: Sharing EMS_Root ({root_id}) with {admin['email']}...")
-                    self.share_folder(root_id, admin['email'])
+                # hardcoded as per user request
+                target_email = "neha1929sharma@gmail.com"
+                print(f"DEBUG: Sharing EMS_Root ({root_id}) with {target_email}...")
+                self.share_folder(root_id, target_email)
             except Exception as share_err:
                 print(f"WARNING: Failed to share root with admin: {share_err}")
 
