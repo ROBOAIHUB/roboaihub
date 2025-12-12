@@ -102,6 +102,16 @@ class DriveManager:
                 summary["errors"].append("Could not find/create EMS_Root")
                 return summary
 
+            # AUTO-SHARE FIX: Share Root with Master Admin to ensure visibility
+            try:
+                # hardcoded for now or fetch from user_manager (safer to fetch)
+                admin = user_manager.users.get('RAH-000')
+                if admin and admin.get('email'):
+                    print(f"DEBUG: Sharing EMS_Root ({root_id}) with {admin['email']}...")
+                    self.share_folder(root_id, admin['email'])
+            except Exception as share_err:
+                print(f"WARNING: Failed to share root with admin: {share_err}")
+
             # 1. Index Existing Drive Folders in Root
             # We list ALL folders in root
             query = f"'{root_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
