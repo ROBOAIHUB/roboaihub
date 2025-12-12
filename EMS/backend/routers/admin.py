@@ -268,6 +268,44 @@ async def generate_sheets(
         }
     }
 
+@router.post("/employees/{emp_id}/generate-sheets")
+async def generate_sheets_for_employee(
+    emp_id: str,
+    request: SheetGenerationRequest,
+    background_tasks: BackgroundTasks,
+    current_user: TokenData = Depends(get_current_user)
+):
+    # Verify Admin (TODO)
+    
+    # Get Employee Info
+    emp_data = user_manager.users.get(emp_id)
+    if not emp_data:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+    # Refresh Services
+    current_drive_manager = get_fresh_drive_manager()
+    current_sheet_manager = get_fresh_sheet_manager()
+    
+    if not current_drive_manager.service:
+         raise HTTPException(status_code=500, detail="Google Drive Service Unavailable")
+
+    # Use BackgroundTasks even for single employee?
+    # 30 sheets might take ~30-60 seconds. Still risky for 50s timeout.
+    # Let's use BackgroundTasks to be safe.
+    background_tasks.add_task(
+        current_sheet_manager.create_month_sheets_for_employee,
+        current_drive_manager, 
+        emp_data['name'],
+        emp_data['folder_id'],
+        request.month, 
+        request.year
+    )
+    
+    return {
+        "status": "success", 
+        "message": f"Generating sheets for {emp_data['name']} in background. Check Logs/Drive in 1-2 mins."
+    }
+
 @router.post("/sync-drive")
 async def sync_drive(current_user: TokenData = Depends(get_current_user)):
     # Verify Admin (TODO)
