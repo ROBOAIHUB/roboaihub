@@ -134,7 +134,7 @@ async def update_employee(emp_id: str, employee: EmployeeUpdate, current_user: T
         designation=employee.designation,
         roles=employee.roles,
         is_mentor=employee.is_mentor,
-        # avenger_character=employee.avenger_character # Future TODO
+        avenger_character=employee.avenger_character 
     )
     
     if not success:

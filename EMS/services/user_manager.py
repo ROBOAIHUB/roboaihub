@@ -68,7 +68,7 @@ class UserManager:
         self._save_users()
         return True, "Employee added successfully."
 
-    def update_employee(self, emp_id, name=None, email=None, password=None, designation=None, roles=None, is_mentor=None):
+    def update_employee(self, emp_id, name=None, email=None, password=None, designation=None, roles=None, is_mentor=None, avenger_character=None):
         if emp_id not in self.users:
             return False, "Employee ID not found."
         
@@ -79,6 +79,7 @@ class UserManager:
         if designation: user['designation'] = designation
         if roles is not None: user['roles'] = roles
         if is_mentor is not None: user['is_mentor'] = is_mentor
+        if avenger_character is not None: user['avenger_character'] = avenger_character
         
         self._save_users()
         return True, "Team member profile updated."
