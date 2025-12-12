@@ -6,7 +6,7 @@ const Admin = () => {
     const [employees, setEmployees] = useState({});
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
-        emp_id: '', name: '', email: '', password: '', designation: '', roles: '', is_mentor: false
+        emp_id: '', name: '', email: '', password: '', designation: '', roles: '', is_mentor: false, avenger_character: 'Avengers'
     });
     const [msg, setMsg] = useState('');
 
@@ -64,7 +64,7 @@ const Admin = () => {
             await api.post('/admin/employees/add', payload);
             setMsg('Employee Added Successfully! 🚀');
             fetchEmployees();
-            setFormData({ emp_id: '', name: '', email: '', password: '', designation: '', roles: '', is_mentor: false });
+            setFormData({ emp_id: '', name: '', email: '', password: '', designation: '', roles: '', is_mentor: false, avenger_character: 'Avengers' });
             setAddModalOpen(false);
         } catch (err) {
             setMsg('Failed to add employee. ❌');
@@ -306,6 +306,41 @@ const Admin = () => {
                                 value={formData.designation} onChange={e => setFormData({ ...formData, designation: e.target.value })}
                                 className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full placeholder:text-cyan-400 placeholder:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition"
                             />
+
+                            {/* Avenger Theme Selector */}
+                            <div>
+                                <label className="block text-xs text-neon-red mb-1 drop-shadow-[0_0_5px_rgba(255,0,0,0.8)]">Protocol Theme (Avenger)</label>
+                                <select
+                                    value={formData.avenger_character || "Avengers"}
+                                    onChange={e => setFormData({ ...formData, avenger_character: e.target.value })}
+                                    className="bg-red-950/30 border border-red-900 p-3 rounded text-neon-blue w-full focus:border-neon-red focus:outline-none focus:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition appearance-none"
+                                >
+                                    <option value="Avengers">Avengers (Default)</option>
+                                    <option value="Iron Man">Iron Man (Tech/Gold)</option>
+                                    <option value="Captain America">Captain America (Blue/Star)</option>
+                                    <option value="Thor">Thor (Lightning/Storm)</option>
+                                    <option value="Hulk">Hulk (Green/Radiation)</option>
+                                    <option value="Black Widow">Black Widow (Stealth/Red)</option>
+                                    <option value="Hawkeye">Hawkeye (Precision/Purple)</option>
+                                    <option value="Spider Man">Spider Man (Web/Red-Blue)</option>
+                                    <option value="Dr. Strange">Dr. Strange (Mystic/Orange-Purple)</option>
+                                    <option value="Black Panther">Black Panther (Vibranium/Purple)</option>
+                                    <option value="Ant Man">Ant Man (Quantum/Red)</option>
+                                    <option value="Star Lord">Star Lord (Galaxy/Purple)</option>
+                                    <option value="Groot">Groot (Nature/Brown)</option>
+                                    <option value="Rocket">Rocket (Tech/Orange)</option>
+                                    <option value="Vision">Vision (Mind Stone/Yellow)</option>
+                                    <option value="Scarlet Witch">Scarlet Witch (Chaos/Red)</option>
+                                    <option value="Falcon">Falcon (Air/Red-White)</option>
+                                    <option value="Winter Soldier">Winter Soldier (Metal/Silver)</option>
+                                    <option value="Loki">Loki (Mischief/Green)</option>
+                                    <option value="Thanos">Thanos (Power/Gold)</option>
+                                    <option value="Deadpool">Deadpool (Chaos/Red-Black)</option>
+                                    <option value="Wolverine">Wolverine (Adamantium/Yellow)</option>
+                                    <option value="Dr. Doom">Dr. Doom (Magic/Green)</option>
+                                    <option value="Riri Williams">Ironheart (NextGen/Pink)</option>
+                                </select>
+                            </div>
                             <div>
                                 <label className="block text-xs text-neon-red mb-1 drop-shadow-[0_0_5px_rgba(255,0,0,0.8)]">Role & Responsibility</label>
                                 <textarea
